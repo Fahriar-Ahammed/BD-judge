@@ -3,7 +3,6 @@
     <q-header elevated>
       <q-toolbar>
         <q-btn
-          v-if="$q.platform.is.mobile"
           flat
           dense
           round
@@ -13,18 +12,14 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Quasar Starter Admin
         </q-toolbar-title>
-        <div v-if="$q.platform.is.desktop" v-for="btn in essentialLinks">
-          <q-btn flat color="white" :label="btn.title" :to="btn.link" />
-        </div>
-        <q-btn  class="glossy" rounded color="teal" label="Sign In"  to="login"/>
 
+        <q-btn class="glossy" rounded color="teal" label="Profile" />
       </q-toolbar>
     </q-header>
 
     <q-drawer
-      v-if="$q.platform.is.mobile"
       v-model="leftDrawerOpen"
       show-if-above
       bordered
@@ -33,13 +28,13 @@
         <q-item-label
           header
         >
-          Online Judge
+          Admin Section
         </q-item-label>
         <template v-for="route in essentialLinks">
           <q-item
             clickable
             v-ripple
-            :active="route.link === this.path.substring(1)"
+            :active="route.link === this.path.substring(7)"
             active-class="my-menu-link"
             :to="route.link"
           >
@@ -67,34 +62,25 @@ import {computed} from 'vue'
 
 const linksList = [
   {
-    title: 'Home',
-    caption: 'quasar.dev',
+    title: 'Dashboard',
     icon: 'school',
-    link: '/'
+    link: 'dashboard'
   },
   {
-    title: 'Test',
-    caption: 'github.com/quasarframework',
+    title: 'Menu1',
     icon: 'code',
-    link: 'test'
+    link: 'menu1'
   },
   {
-    title: 'Problems',
-    caption: 'chat.quasar.dev',
+    title: 'Menu2',
     icon: 'chat',
-    link: 'problems'
-  },
-  {
-    title: 'Submissions',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'submissions'
-  },
+    link: 'menu2'
+  }
 
 ]
 
 export default defineComponent({
-  name: 'MainLayout',
+  name: 'AdminLayout',
 
   components: {
     EssentialLink
