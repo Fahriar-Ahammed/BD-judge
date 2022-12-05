@@ -4,10 +4,12 @@ const routes = [
     path: '/',
     component: () => import('layouts/MainLayout.vue'),
     children: [
-      { path: '', component: () => import('pages/IndexPage.vue') },
-      { path: 'test', component: () => import('pages/test.vue') },
-      { path: 'problems', component: () => import('pages/home/Problems.vue') },
-      { path: 'submissions', component: () => import('pages/home/Submissions.vue') },
+      {  path: '', component: () => import('pages/IndexPage.vue') },
+      { path: 'admin-login', component: () => import('pages/admin/login.vue') },
+      { path: 'login', component: () => import('pages/Auth.vue') },
+      { path: 'page1', component: () => import('pages/Page1.vue') },
+      { path: 'page2', component: () => import('pages/Page2.vue') },
+      { path: 'user-profile', component: () => import('pages/user/Profile.vue') },
     ]
   },
   {
@@ -15,9 +17,9 @@ const routes = [
     redirect:'/admin/dashboard',
     component: () => import('layouts/AdminLayout.vue'),
     children: [
-      { path: 'dashboard', component: () => import('pages/admin/Dashboard.vue') },
-      { path: 'menu1', component: () => import('pages/admin/Menu1.vue') },
-      { path: 'menu2', component: () => import('pages/admin/Menu2.vue') }
+      { meta:{requiresAdmin: true} ,path: 'dashboard', component: () => import('pages/admin/Dashboard.vue') },
+      { meta:{requiresAdmin: true} , path: 'menu1', component: () => import('pages/admin/Menu1.vue') },
+      { meta:{requiresAdmin: true} , path: 'menu2', component: () => import('pages/admin/Menu2.vue') }
     ]
   },
 

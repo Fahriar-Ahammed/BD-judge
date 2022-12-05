@@ -15,7 +15,7 @@
           Quasar Starter Admin
         </q-toolbar-title>
 
-        <q-btn class="glossy" rounded color="teal" label="Profile" />
+        <q-btn v-on:click="logout" class="glossy" rounded color="teal" label="logout"/>
       </q-toolbar>
     </q-header>
 
@@ -30,37 +30,37 @@
         >
           Admin Section
         </q-item-label>
-        <template v-for="route in essentialLinks">
+        <template v-for="route in menuList">
           <q-item
             clickable
             v-ripple
-            :active="route.link === this.path.substring(7)"
+            :active="route.link === path.substring(7)"
             active-class="my-menu-link"
             :to="route.link"
           >
             <q-item-section avatar>
-              <q-icon :name="route.icon" />
+              <q-icon :name="route.icon"/>
             </q-item-section>
 
-            <q-item-section>{{route.title}}</q-item-section>
+            <q-item-section>{{ route.title }}</q-item-section>
           </q-item>
         </template>
       </q-list>
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
-import {useRoute} from 'vue-router'
+<script setup>
+import {defineComponent, ref} from 'vue'
+import {useRoute, useRouter} from 'vue-router'
 import {computed} from 'vue'
+import {api} from 'boot/axios'
 
-const linksList = [
+const menuList = [
   {
     title: 'Dashboard',
     icon: 'school',
@@ -76,39 +76,28 @@ const linksList = [
     icon: 'chat',
     link: 'menu2'
   }
-
 ]
 
-export default defineComponent({
-  name: 'AdminLayout',
+const leftDrawerOpen = ref(false)
 
-  components: {
-    EssentialLink
-  },
+const route = useRoute();
+const path = computed(() => route.path)
+const router = useRouter()
 
-  setup () {
-    const leftDrawerOpen = ref(false)
 
-    const route=useRoute();
-    const path = computed(() =>route.path)
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
 
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      path,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
-  },
-  data(){
-    return{
-
-    }
-  },
-  methods:{
-  }
-})
+function logout() {
+  const token = localStorage.getItem("token")
+  api.post('api/auth/logout?token=' + token)
+    .then((response) => {
+      localStorage.setItem("role", "")
+      localStorage.setItem("token", "")
+      router.push('/')
+    })
+}
 </script>
 
 <style lang="sass">

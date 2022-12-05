@@ -1,8 +1,8 @@
 {
-  "name": "online-judge",
+  "name": "quasar-starter",
   "version": "0.0.1",
-  "description": "An online judge",
-  "productName": "online judge",
+  "description": "Quasar starter with admin section and laravel auth.",
+  "productName": "Quasar Starter",
   "author": "Fahriar Ahammed <fahriar.ahammed@outlook.com>",
   "private": true,
   "scripts": {
@@ -13,10 +13,10 @@
     "@codemirror/lang-javascript": "^6.1.1",
     "@codemirror/theme-one-dark": "^6.1.0",
     "@quasar/extras": "^1.0.0",
-    "axios": "^0.21.1",
-    "codemirror": "^6.0.1",
+    "axios": "^1.2.0",
+    "pinia": "^2.0.27",
     "quasar": "^2.6.0",
-    "vue": "^3.0.0",
+    "vue": "^3.2.45",
     "vue-codemirror": "^6.1.1",
     "vue-router": "^4.0.0"
   },

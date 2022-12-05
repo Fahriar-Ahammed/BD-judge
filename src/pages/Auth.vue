@@ -10,20 +10,18 @@
           indicator-color="purple"
           align="justify"
         >
-          <q-tab name="signIn" label="Sign In" />
-          <q-tab name="signUp" label="Sign Up" />
+          <q-tab name="signIn" label="Sign In"/>
+          <q-tab name="signUp" label="Sign Up"/>
         </q-tabs>
 
         <q-tab-panels v-model="tab" animated class="bg-white">
           <q-tab-panel name="signIn">
             <q-form
-              @submit="onSubmit"
-              @reset="onReset"
               class="q-gutter-md"
             >
               <q-input
                 filled
-                v-model="name"
+                v-model="authData.email"
                 label="Email *"
                 hint="enter you email"
                 lazy-rules
@@ -33,71 +31,11 @@
               <q-input
                 filled
                 type="password"
-                v-model="password"
+                v-model="authData.password"
                 label="password *"
                 lazy-rules
                 :rules="[
           val => val !== null && val !== '' || 'Please Enter your password'
-        ]"
-              />
-
-<!--
-              <q-toggle v-model="accept" label="I accept the license and terms" />
--->
-
-              <div>
-                <q-btn label="Login" type="submit" color="primary"/>
-<!--
-                <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
--->
-              </div>
-            </q-form>
-
-          </q-tab-panel>
-
-          <q-tab-panel name="signUp">
-            <q-form
-              @submit="onSubmit"
-              @reset="onReset"
-              class="q-gutter-md"
-            >
-              <q-input
-                filled
-                v-model="name"
-                label="Name *"
-                hint="enter you full name"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please enter your Full Name']"
-              />
-
-              <q-input
-                filled
-                v-model="email"
-                label="Email *"
-                hint="enter you email"
-                lazy-rules
-                :rules="[ val => val && val.length > 0 || 'Please enter your email']"
-              />
-
-              <q-input
-                filled
-                type="password"
-                v-model="password"
-                label="password *"
-                lazy-rules
-                :rules="[
-          val => val !== null && val !== '' || 'Please Enter your password'
-        ]"
-              />
-
-              <q-input
-                filled
-                type="password"
-                v-model="password_confirmation"
-                label="Confirm password *"
-                lazy-rules
-                :rules="[
-          val => val !== null && val !== password_confirmation || 'Please Confirm your password'
         ]"
               />
 
@@ -106,7 +44,62 @@
               -->
 
               <div>
-                <q-btn label="Register" type="submit" color="primary"/>
+                <q-btn v-on:click="login" label="Login" color="primary"/>
+              </div>
+            </q-form>
+
+          </q-tab-panel>
+
+          <q-tab-panel name="signUp">
+            <q-form
+              class="q-gutter-md"
+            >
+              <q-input
+                filled
+                v-model="authData.name"
+                label="Name *"
+                hint="enter you full name"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please enter your Full Name']"
+              />
+
+              <q-input
+                filled
+                v-model="authData.email"
+                label="Email *"
+                hint="enter you email"
+                lazy-rules
+                :rules="[ val => val && val.length > 0 || 'Please enter your email']"
+              />
+
+              <q-input
+                filled
+                type="password"
+                v-model="authData.password"
+                label="password *"
+                lazy-rules
+                :rules="[
+          val => val !== null && val !== '' || 'Please Enter your password'
+        ]"
+              />
+
+              <q-input
+                filled
+                type="password"
+                v-model="authData.password_confirmation"
+                label="Confirm password *"
+                lazy-rules
+                :rules="[
+          val => val !== null && val !== authData.password || 'Please Confirm your password'
+        ]"
+              />
+
+              <!--
+                            <q-toggle v-model="accept" label="I accept the license and terms" />
+              -->
+
+              <div>
+                <q-btn v-on:click="register" label="Register" type="submit" color="primary"/>
                 <!--
                                 <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm" />
                 -->
@@ -122,56 +115,36 @@
   </q-page>
 </template>
 
-<script>
-import {ref} from "vue";
-import {useQuasar} from "quasar";
+<script setup>
+import {reactive, ref} from "vue";
+import {api} from 'boot/axios'
+import {useRouter} from 'vue-router'
+import {useAuthStore} from "stores/auth";
 
-export default {
-  name: "Auth",
-  setup () {
-    const $q = useQuasar()
+const tab = ref('signIn')
+const router = useRouter()
+const authData = reactive({
+  name: '',
+  email: '',
+  password: '',
+  password_confirmation: '',
+})
 
-    const name = ref(null)
-    const email = ref(null)
-    const password = ref(null)
-    const password_confirmation = ref(null)
-    const accept = ref(false)
-    return {
-      tab: ref('signIn'),
-      name,
-      email,
-      password,
-      password_confirmation,
-      accept,
+const authStore = useAuthStore()
 
-      onSubmit () {
-        if (accept.value !== true) {
-          $q.notify({
-            color: 'red-5',
-            textColor: 'white',
-            icon: 'warning',
-            message: 'You need to accept the license and terms first'
-          })
-        }
-        else {
-          $q.notify({
-            color: 'green-4',
-            textColor: 'white',
-            icon: 'cloud_done',
-            message: 'Submitted'
-          })
-        }
-      },
-
-      onReset () {
-        name.value = null
-        password.value = null
-        accept.value = false
-      }
-
-    }
-  }
+function login() {
+  authStore.login(authData.email, authData.password)
+  router.push('/')
 }
+
+function register() {
+  api.post('api/auth/register', authData)
+    .then(response => {
+      console.log(response)
+    })
+}
+
+
 </script>
 
 <style scoped>

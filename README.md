@@ -1,6 +1,6 @@
-# online judge (online-judge)
+# Quasar Starter (quasar-starter)
 
-An online judge
+Quasar starter with admin section and laravel auth.
 
 ## Install the dependencies
 ```bash

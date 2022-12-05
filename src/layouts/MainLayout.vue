@@ -13,12 +13,15 @@
         />
 
         <q-toolbar-title>
-          Quasar App
+          Online Judge
         </q-toolbar-title>
-        <div v-if="$q.platform.is.desktop" v-for="btn in essentialLinks">
-          <q-btn flat color="white" :label="btn.title" :to="btn.link" />
+        <div v-if="$q.platform.is.desktop">
+          <q-btn flat color="white" label="Home" to="/"/>
+          <q-btn flat color="white" label="Page1" to="page1"/>
+          <q-btn flat color="white" label="Page2" to="page2"/>
         </div>
-        <q-btn  class="glossy" rounded color="teal" label="Sign In"  to="login"/>
+        <q-btn v-if="!authStore.loggedIn" class="glossy" rounded color="teal" label="Sign In" to="login"/>
+        <q-btn v-else  v-on:click="authStore.logout" class="glossy" rounded color="teal" label="logout" />
 
       </q-toolbar>
     </q-header>
@@ -33,100 +36,69 @@
         <q-item-label
           header
         >
-          Online Judge
+          Admin Section
         </q-item-label>
-        <template v-for="route in essentialLinks">
+        <template v-for="route in menuList">
           <q-item
             clickable
             v-ripple
-            :active="route.link === this.path.substring(1)"
+            :active="route.link === path.substring(1)"
             active-class="my-menu-link"
             :to="route.link"
           >
             <q-item-section avatar>
-              <q-icon :name="route.icon" />
+              <q-icon :name="route.icon"/>
             </q-item-section>
 
-            <q-item-section>{{route.title}}</q-item-section>
+            <q-item-section>{{ route.title }}</q-item-section>
           </q-item>
         </template>
       </q-list>
     </q-drawer>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
   </q-layout>
 </template>
 
-<script>
-import { defineComponent, ref } from 'vue'
-import EssentialLink from 'components/EssentialLink.vue'
-import {useRoute} from 'vue-router'
-import {computed} from 'vue'
+<script setup>
+import {computed, ref, watch} from 'vue'
+import {useRoute,useRouter} from 'vue-router'
+import { api } from 'boot/axios'
+import {useAuthStore} from "stores/auth";
 
-const linksList = [
+
+const menuList = [
   {
     title: 'Home',
-    caption: 'quasar.dev',
-    icon: 'school',
+    icon: 'home',
     link: '/'
   },
   {
-    title: 'Test',
-    caption: 'github.com/quasarframework',
+    title: 'Page1',
     icon: 'code',
-    link: 'test'
+    link: 'page1'
   },
   {
-    title: 'Problems',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'problems'
+    title: 'Page2',
+    icon: 'code',
+    link: 'page2'
   },
-  {
-    title: 'Submissions',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'submissions'
-  },
-
 ]
+const leftDrawerOpen = ref(false)
+const route = useRoute();
+const router = useRouter()
+const path = computed(() => route.path)
 
-export default defineComponent({
-  name: 'MainLayout',
+const authStore = useAuthStore()
 
-  components: {
-    EssentialLink
-  },
+console.log("pinia data  "+authStore.loggedIn)
 
-  setup () {
-    const leftDrawerOpen = ref(false)
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
+}
 
-    const route=useRoute();
-    const path = computed(() =>route.path)
 
-    return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      path,
-      toggleLeftDrawer () {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
-    }
-  },
-  data(){
-    return{
 
-    }
-  },
-  methods:{
-  }
-})
 </script>
-
-<style lang="sass">
-.my-menu-link
-  color: white
-  background: #F2C037
-</style>
