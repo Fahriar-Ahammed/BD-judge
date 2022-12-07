@@ -29,7 +29,7 @@
         ]"
               />
               <div v-if="loading">
-                <q-linear-progress indeterminate color="secondary" class="q-mt-sm"/>
+                <q-linear-progress  indeterminate color="secondary" class="q-mt-sm"/>
                 <br/>
               </div>
               <q-btn v-on:click="login" label="Login"  color="primary"/>

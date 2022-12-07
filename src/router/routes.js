@@ -18,7 +18,7 @@ const routes = [
     component: () => import('layouts/AdminLayout.vue'),
     children: [
       { meta:{requiresAdmin: true} ,path: 'dashboard', component: () => import('pages/admin/Dashboard.vue') },
-      { meta:{requiresAdmin: true} , path: 'menu1', component: () => import('pages/admin/Menu1.vue') },
+      { meta:{requiresAdmin: true} , path: 'problems', component: () => import('pages/admin/Problems.vue') },
       { meta:{requiresAdmin: true} , path: 'menu2', component: () => import('pages/admin/Menu2.vue') }
     ]
   },

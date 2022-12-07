@@ -67,9 +67,9 @@ const menuList = [
     link: 'dashboard'
   },
   {
-    title: 'Menu1',
+    title: 'Problems',
     icon: 'code',
-    link: 'menu1'
+    link: 'problems'
   },
   {
     title: 'Menu2',
