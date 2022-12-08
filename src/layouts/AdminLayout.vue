@@ -12,7 +12,7 @@
         />
 
         <q-toolbar-title>
-          Quasar Starter Admin
+          Online Judge Admin
         </q-toolbar-title>
 
         <q-btn v-on:click="logout" class="glossy" rounded color="teal" label="logout"/>
@@ -23,6 +23,7 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
+      :width="200"
     >
       <q-list>
         <q-item-label

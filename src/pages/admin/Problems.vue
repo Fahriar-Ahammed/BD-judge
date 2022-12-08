@@ -5,33 +5,46 @@
         title="Treats"
         :rows="rows"
         :columns="columns"
-        row-key="name"
+        row-key="id"
+        :loading="tableLoading"
       >
         <template v-slot:top>
           <q-btn flat outline dense color="primary" label="Add row" @click="showDialog = true" ></q-btn>
 
           <div class="q-pa-sm q-gutter-sm">
             <q-dialog v-model="showDialog">
-              <q-card>
+              <q-card style="width: 800px;max-width: 1000px">
                 <q-card-section>
-                  <div class="text-h6">Add new item</div>
+                  <div class="text-h6">Add new Problem</div>
                 </q-card-section>
 
                 <q-card-section>
-                  <div class="row">
-                    <q-input v-model="editedItem.name" label="Dessert Name"></q-input>
-                    <q-input v-model="editedItem.calories" label="Calories"></q-input>
-                    <q-input v-model="editedItem.fat" label="Fat"></q-input>
-                    <q-input v-model="editedItem.carbs" label="Carbs"></q-input>
-                    <q-input v-model="editedItem.protein" label="Protein"></q-input>
-                    <q-input v-model="editedItem.sodium" label="Sodium"></q-input>
-                    <q-input v-model="editedItem.calcium" label="Calcium"></q-input>
-                    <q-input v-model="editedItem.iron" label="Iron"></q-input>
+                  <div>
+                    <q-select
+                      class="q-ma-sm"
+                      outlined
+                      v-model="editedItem.category_id"
+                      :options="categoryOption"
+                      emit-value
+                      label="Complexity Type" />
+                    <q-input outlined class="q-ma-sm" v-model="editedItem.title" label="title"></q-input>
+                    <div class="q-ma-sm">
+                      <label>Problem Description</label>
+                      <q-editor  v-model="editedItem.description" label="description"></q-editor>
+                    </div>
+                     <q-input outlined class="q-ma-sm" v-model="editedItem.sample_input" label="sample input"></q-input>
+                    <q-input outlined class="q-ma-sm" v-model="editedItem.sample_output" label="sample output"></q-input>
+                    <q-input outlined class="q-ma-sm" v-model="editedItem.score" label="score"></q-input>
                   </div>
                 </q-card-section>
 
+                <div v-if="loading">
+                  <q-linear-progress  indeterminate color="secondary" class="q-mt-sm"/>
+                  <br/>
+                </div>
+
                 <q-card-actions align="right">
-                  <q-btn flat label="OK" color="primary" v-close-popup @click="addRow" ></q-btn>
+                  <q-btn flat label="Create" color="primary"  @click="addProblem" ></q-btn>
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -41,34 +54,14 @@
 
         <template v-slot:body="props">
           <q-tr :props="props">
-            <q-td key="desc" :props="props">
-              {{ props.row.name }}
-              <q-popup-edit v-model="props.row.name">
-                <q-input v-model="props.row.name" dense autofocus counter ></q-input>
-              </q-popup-edit>
-            </q-td>
-            <q-td key="calories" :props="props">
-              {{ props.row.calories }}
-              <q-popup-edit v-model="props.row.calories" title="Update calories" buttons>
-                <q-input type="number" v-model="props.row.calories" dense autofocus ></q-input>
-              </q-popup-edit>
-            </q-td>
-            <q-td key="fat" :props="props">
-              <div class="text-pre-wrap">{{ props.row.fat }}</div>
-              <q-popup-edit v-model="props.row.fat">
-                <q-input type="textarea" v-model="props.row.fat" dense autofocus ></q-input>
-              </q-popup-edit>
-            </q-td>
-            <q-td key="carbs" :props="props">
-              {{ props.row.carbs }}
-              <q-popup-edit v-model="props.row.carbs" title="Update carbs" buttons persistent>
-                <q-input type="number" v-model="props.row.carbs" dense autofocus hint="Use buttons to close" ></q-input>
-              </q-popup-edit>
-            </q-td>
-            <q-td key="protein" :props="props">{{ props.row.protein }}</q-td>
-            <q-td key="sodium" :props="props">{{ props.row.sodium }}</q-td>
-            <q-td key="calcium" :props="props">{{ props.row.calcium }}</q-td>
-            <q-td key="iron" :props="props">{{ props.row.iron }}</q-td>
+            <q-td key="id" :props="props">{{ props.row.id }}</q-td>
+            <q-td key="title" :props="props">{{ props.row.title }}</q-td>
+            <q-td v-if="props.row.category_id === 1" key="level" :props="props">Easy</q-td>
+            <q-td v-if="props.row.category_id === 2" key="level" :props="props">Medium</q-td>
+            <q-td v-if="props.row.category_id === 3" key="level" :props="props">Hard</q-td>
+
+            <q-td key="score" :props="props">{{ props.row.score}}</q-td>
+
             <q-td key="actions" :props="props">
               <q-btn color="blue" label="update" @click="editItem(props.row)" size=sm></q-btn>
               <q-btn color="red" label="delete"  @click="deleteItem(props.row)" size=sm></q-btn>
@@ -84,112 +77,65 @@
 
 <script setup>
 import {reactive, ref} from "vue";
+import {api} from "boot/axios";
 
 const editedItem = reactive({
-  name: "",
-  calories: 0,
-  fat: 0,
-  carbs: 0,
-  protein: 0,
-  sodium: 0,
-  calcium: "0%",
-  iron: "0%"
+  category_id: "",
+  title: "",
+  description: "",
+  sample_input: "",
+  sample_output: "",
+  score: 0,
 })
 
 const columns = [
   {
-    name: 'desc',
+    name: 'id',
     required: true,
-    label: 'Dessert (100g serving)',
+    label: 'ID',
     align: 'left',
-    field: row => row.name,
+    field: row => row.id,
     format: val => `${val}`,
     sortable: true
   },
-  { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-  { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-  { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-  { name: 'protein', label: 'Protein (g)', field: 'protein' },
+  { name: 'title', align: 'center', label: 'Title', field: 'title', sortable: true },
+  { name: 'level', label: 'Level', field: 'level', sortable: true },
+  { name: 'score', label: 'Score', field: 'score' },
   { name: 'actions', label: 'Actions', field: 'actions' }
 ]
 
-const rows = [
-  {
-    name: 'Frozen Yogurt',
-    calories: 159,
-    fat: 6.0,
-    carbs: 24,
-    protein: 4.0
-  },
-  {
-    name: 'Ice cream sandwich',
-    calories: 237,
-    fat: 9.0,
-    carbs: 37,
-    protein: 4.3
-  },
-  {
-    name: 'Eclair',
-    calories: 262,
-    fat: 16.0,
-    carbs: 23,
-    protein: 6.0
-  },
-  {
-    name: 'Cupcake',
-    calories: 305,
-    fat: 3.7,
-    carbs: 67,
-    protein: 4.3
-  },
-  {
-    name: 'Gingerbread',
-    calories: 356,
-    fat: 16.0,
-    carbs: 49,
-    protein: 3.9
-  },
-  {
-    name: 'Jelly bean',
-    calories: 375,
-    fat: 0.0,
-    carbs: 94,
-    protein: 0.0
-  },
-  {
-    name: 'Lollipop',
-    calories: 392,
-    fat: 0.2,
-    carbs: 98,
-    protein: 0
-  },
-  {
-    name: 'Honeycomb',
-    calories: 408,
-    fat: 3.2,
-    carbs: 87,
-    protein: 6.5
-  },
-  {
-    name: 'Donut',
-    calories: 452,
-    fat: 25.0,
-    carbs: 51,
-    protein: 4.9
-  },
-  {
-    name: 'KitKat',
-    calories: 518,
-    fat: 26.0,
-    carbs: 65,
-    protein: 7
-  }
+let rows = []
+
+const categoryOption = [
+  {label:'Easy',value:1},
+  {label:'Medium',value:2},
+  {label:'Hard',value:3},
 ]
 
 let showDialog = ref(false)
 
-function addRow(){
+let loading = ref(false)
+let tableLoading = ref(false)
 
+function fetchProblems(){
+  tableLoading.value = true
+  api.get('api/auth/problems/all?token='+localStorage.getItem("token"))
+    .then(response => {
+      rows = response.data
+      tableLoading.value = false
+    })
+}
+
+fetchProblems()
+
+function addProblem(){
+  loading.value = true
+  api.post('api/auth/problems/create?token='+localStorage.getItem("token"),editedItem)
+    .then(response => {
+      fetchProblems()
+      loading.value = false
+      showDialog.value = false
+    })
 }
 
 function deleteItem(item) {
