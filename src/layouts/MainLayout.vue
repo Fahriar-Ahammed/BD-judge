@@ -17,7 +17,7 @@
         </q-toolbar-title>
         <div v-if="$q.platform.is.desktop">
           <q-btn flat color="white" label="Home" to="/"/>
-          <q-btn flat color="white" label="Page1" to="page1"/>
+          <q-btn flat color="white" label="Problems" to="problems"/>
           <q-btn flat color="white" label="Page2" to="page2"/>
         </div>
         <q-btn v-if="!authStore.loggedIn" class="glossy" rounded color="teal" label="Sign In" to="login"/>

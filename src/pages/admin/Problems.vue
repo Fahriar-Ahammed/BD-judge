@@ -53,7 +53,7 @@
         </template>
 
         <template v-slot:body="props">
-          <q-tr :props="props">
+          <q-tr :props="props">  <!--@click="viewProblem(props.row)"-->
             <q-td key="id" :props="props">{{ props.row.id }}</q-td>
             <q-td key="title" :props="props">{{ props.row.title }}</q-td>
             <q-td v-if="props.row.category_id === 1" key="level" :props="props">Easy</q-td>
@@ -63,8 +63,8 @@
             <q-td key="score" :props="props">{{ props.row.score}}</q-td>
 
             <q-td key="actions" :props="props">
-              <q-btn color="blue" label="update" @click="editItem(props.row)" size=sm></q-btn>
-              <q-btn color="red" label="delete"  @click="deleteItem(props.row)" size=sm></q-btn>
+              <q-btn  color="blue" class="glossy q-mr-sm" push round icon="edit"  @click="editItem(props.row)" size=sm></q-btn>
+              <q-btn color="red" class="glossy q-mr-sm" push round icon="delete"  @click="deleteItem(props.row)" size=sm></q-btn>
             </q-td>
           </q-tr>
         </template>
@@ -76,10 +76,10 @@
 </template>
 
 <script setup>
-import {reactive, ref} from "vue";
+import {onMounted, reactive, ref} from "vue";
 import {api} from "boot/axios";
 
-const editedItem = reactive({
+let editedItem = reactive({
   category_id: "",
   title: "",
   description: "",
@@ -126,7 +126,9 @@ function fetchProblems(){
     })
 }
 
-fetchProblems()
+onMounted(() => {
+  fetchProblems()
+})
 
 function addProblem(){
   loading.value = true
@@ -145,9 +147,8 @@ function deleteItem(item) {
 }
 
 function editItem(item) {
-  this.editedIndex = this.data.indexOf(item);
-  this.editedItem = Object.assign({}, item);
-  this.show_dialog = true;
+  editedItem = Object.assign({}, item);
+  showDialog.value = true
 }
 
 
