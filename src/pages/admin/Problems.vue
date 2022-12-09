@@ -70,7 +70,6 @@
         </template>
       </q-table>
 
-
     </div>
   </div>
 </template>
