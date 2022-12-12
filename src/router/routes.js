@@ -9,7 +9,7 @@ const routes = [
       { path: 'login', component: () => import('pages/Auth.vue') },
       { path: 'problems', component: () => import('pages/Problems.vue') },
       { path: 'problem-details/:id', name:'problem-details', component: () => import('pages/ProblemDetails.vue') },
-      { path: 'page2', component: () => import('pages/test.vue') },
+      { path: 'page2', component: () => import('pages/test2.vue') },
       { path: 'user-profile', component: () => import('pages/user/Profile.vue') },
     ]
   },
