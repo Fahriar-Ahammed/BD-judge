@@ -14,7 +14,7 @@
           </div>
           <div class="col-sm">
             <q-card>
-              <q-select outlined dense options-dense v-model="language" :options="options" label="Language" @update:model-value="languageChange()"
+              <q-select outlined dense options-dense v-model="language" :options="options" option-label="name" option-value="value" label="Language" @update:model-value="languageChange()"
                         style="max-width: 200px"/>
               <br/>
               <codemirror
@@ -67,8 +67,18 @@ function fetchProblem(id) {
 
 
 let code= ref()
-const options = ['C', 'Cpp', 'Java', 'Javascript', 'Python']
-let language = ref()
+//const options = ['C', 'Cpp', 'Java', 'Javascript', 'Python']
+const options = [
+  {name:'C',value:'1'},
+  {name:'Cpp',value:'2'},
+  {name:'Java',value:'4'},
+  /*{name:'Javascript',value:'63'},*/
+  {name:'Python',value:'10'},
+]
+let language = ref({
+  name:'',
+  value:''
+})
 let extensions = ref()
 let handleReady= ref()
 
@@ -76,7 +86,7 @@ async function submit() {
   let self = this
   await axios.post('http://localhost:2358/submissions', {
     source_code: self.code,
-    language_id: '1',
+    language_id: language.value.value,
     stdin: 'Good',
   })
     .then(function (response) {
@@ -106,9 +116,9 @@ function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
 }
 function languageChange() {
-  console.log("###   " , language.value)
+  console.log("###   " , language.value.name)
 
-  if (language.value === 'Java') {
+  if (language.value.name === 'Java') {
     extensions.value = [java(), oneDark]
     code = ref(`import java.io.IOException;
 
@@ -119,10 +129,19 @@ public class Main {
     }
 
 }`)
-  } else if (language.value === 'Javascript') {
+  } else if (language.value.name === 'Javascript') {
     extensions.value = [javascript(), oneDark]
     code = ref(`console.log('Hello, world!')`)
-  } else if (language.value === 'Cpp') {
+  } else if (language.value.name === 'C') {
+    extensions.value = [cpp(), oneDark]
+    code = ref(`#include <stdio.h>
+
+int main()
+{
+
+    return 0;
+}`)
+  } else if (language.value.name === 'Cpp') {
     extensions.value = [cpp(), oneDark]
     code = ref(`#include <iostream>
 
@@ -132,9 +151,15 @@ int main() {
 
 }`)
   } else {
-    language.value = 'Javascript'
-    extensions.value = [javascript(),oneDark]
-    code = ref(`console.log('Hello, world!')`)
+    language.value.name = 'C'
+    extensions.value = [cpp(), oneDark]
+    code = ref(`#include <stdio.h>
+
+int main()
+{
+
+    return 0;
+}`)
   }
 
 
