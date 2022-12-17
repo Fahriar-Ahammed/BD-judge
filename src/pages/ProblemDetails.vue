@@ -45,8 +45,10 @@ import {useRoute} from "vue-router/dist/vue-router";
 import {javascript} from '@codemirror/lang-javascript'
 import {java} from '@codemirror/lang-java'
 import {cpp} from '@codemirror/lang-cpp'
+import {python} from '@codemirror/lang-python'
 import {oneDark} from '@codemirror/theme-one-dark'
 import axios from "axios";
+import { useQuasar } from 'quasar'
 
 
 const problem = ref({})
@@ -91,7 +93,7 @@ async function submit() {
   })
     .then(function (response) {
       console.log(response.data.token);
-      self.delay(2000).then(() => {
+      self.delay(1000).then(() => {
         self.submissionResult(response.data.token);
       })
 
@@ -105,6 +107,7 @@ async function submissionResult(token) {
     .then(function (response) {
       // handle success
       console.log(response);
+      showNotif()
     })
     .catch(function (error) {
       // handle error
@@ -132,6 +135,9 @@ public class Main {
   } else if (language.value.name === 'Javascript') {
     extensions.value = [javascript(), oneDark]
     code = ref(`console.log('Hello, world!')`)
+  }else if (language.value.name === 'Python') {
+    extensions.value = [python(), oneDark]
+    code = ref(`print('Hello, world!')`)
   } else if (language.value.name === 'C') {
     extensions.value = [cpp(), oneDark]
     code = ref(`#include <stdio.h>
@@ -181,6 +187,7 @@ int main()
     // return ...
   }
 }
+
 
 onMounted(() =>{
   let id = route.params.id

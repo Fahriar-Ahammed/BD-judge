@@ -9,7 +9,7 @@
         :loading="tableLoading"
       >
         <template v-slot:top>
-          <q-btn flat outline dense color="primary" label="Add row" @click="showDialog = true" ></q-btn>
+          <q-btn flat outline dense color="primary" label="Add row" @click="showDialog = true"></q-btn>
 
           <div class="q-pa-sm q-gutter-sm">
             <q-dialog v-model="showDialog">
@@ -26,25 +26,40 @@
                       v-model="editedItem.category_id"
                       :options="categoryOption"
                       emit-value
-                      label="Complexity Type" />
+                      label="Complexity Type"/>
                     <q-input outlined class="q-ma-sm" v-model="editedItem.title" label="title"></q-input>
                     <div class="q-ma-sm">
                       <label>Problem Description</label>
-                      <q-editor  v-model="editedItem.description" label="description"></q-editor>
+                      <q-editor v-model="editedItem.description" label="description"></q-editor>
                     </div>
-                     <q-input outlined class="q-ma-sm" v-model="editedItem.sample_input" label="sample input"></q-input>
-                    <q-input outlined class="q-ma-sm" v-model="editedItem.sample_output" label="sample output"></q-input>
+
+                    <div v-for="(item,index) in testCases" :key="item">
+                      <div class="row">
+                        <div class="col-sm-5">
+                          <q-input autogrow outlined class="q-ma-sm" v-model="item.input"
+                                   label="sample input"></q-input>
+                        </div>
+                        <div class="col-sm-5">
+                          <q-input autogrow outlined class="q-ma-sm" v-model="item.output"
+                                   label="sample output"></q-input>
+                        </div>
+                        <div class="col-sm-2 flex flex-center">
+                          <q-btn  color="blue" class="glossy q-mr-sm" push round icon="add" @click="addRow"></q-btn>&nbsp;
+                          <q-btn  color="red" class="glossy q-mr-sm" push round icon="highlight_off" @click="removeRow(index)"></q-btn>
+                        </div>
+                      </div>
+                    </div>
                     <q-input outlined class="q-ma-sm" v-model="editedItem.score" label="score"></q-input>
                   </div>
                 </q-card-section>
 
                 <div v-if="loading">
-                  <q-linear-progress  indeterminate color="secondary" class="q-mt-sm"/>
+                  <q-linear-progress indeterminate color="secondary" class="q-mt-sm"/>
                   <br/>
                 </div>
 
                 <q-card-actions align="right">
-                  <q-btn flat label="Create" color="primary"  @click="addProblem" ></q-btn>
+                  <q-btn flat label="Create" color="primary" @click="addProblem"></q-btn>
                 </q-card-actions>
               </q-card>
             </q-dialog>
@@ -60,11 +75,13 @@
             <q-td v-if="props.row.category_id === 2" key="level" :props="props">Medium</q-td>
             <q-td v-if="props.row.category_id === 3" key="level" :props="props">Hard</q-td>
 
-            <q-td key="score" :props="props">{{ props.row.score}}</q-td>
+            <q-td key="score" :props="props">{{ props.row.score }}</q-td>
 
             <q-td key="actions" :props="props">
-              <q-btn  color="blue" class="glossy q-mr-sm" push round icon="edit"  @click="editItem(props.row)" size=sm></q-btn>
-              <q-btn color="red" class="glossy q-mr-sm" push round icon="delete"  @click="deleteItem(props.row)" size=sm></q-btn>
+              <q-btn color="blue" class="glossy q-mr-sm" push round icon="edit" @click="editItem(props.row)"
+                     size=sm></q-btn>
+              <q-btn color="red" class="glossy q-mr-sm" push round icon="delete" @click="deleteItem(props.row)"
+                     size=sm></q-btn>
             </q-td>
           </q-tr>
         </template>
@@ -78,14 +95,27 @@
 import {onMounted, reactive, ref} from "vue";
 import {api} from "boot/axios";
 
+let testCases = reactive([{
+  input: "",
+  output: "",
+}])
+
 let editedItem = reactive({
   category_id: "",
   title: "",
   description: "",
-  sample_input: "",
-  sample_output: "",
+  testCase:testCases,
   score: 0,
 })
+
+function addRow(){
+  testCases.push({ input : '', output: ''})
+}
+function removeRow(index){
+  if(testCases.length > 1){
+    testCases.splice(index,1)
+  }
+}
 
 const columns = [
   {
@@ -97,18 +127,18 @@ const columns = [
     format: val => `${val}`,
     sortable: true
   },
-  { name: 'title', align: 'center', label: 'Title', field: 'title', sortable: true },
-  { name: 'level', label: 'Level', field: 'level', sortable: true },
-  { name: 'score', label: 'Score', field: 'score' },
-  { name: 'actions', label: 'Actions', field: 'actions' }
+  {name: 'title', align: 'center', label: 'Title', field: 'title', sortable: true},
+  {name: 'level', label: 'Level', field: 'level', sortable: true},
+  {name: 'score', label: 'Score', field: 'score'},
+  {name: 'actions', label: 'Actions', field: 'actions'}
 ]
 
 let rows = []
 
 const categoryOption = [
-  {label:'Easy',value:1},
-  {label:'Medium',value:2},
-  {label:'Hard',value:3},
+  {label: 'Easy', value: 1},
+  {label: 'Medium', value: 2},
+  {label: 'Hard', value: 3},
 ]
 
 let showDialog = ref(false)
@@ -116,9 +146,9 @@ let showDialog = ref(false)
 let loading = ref(false)
 let tableLoading = ref(false)
 
-function fetchProblems(){
+function fetchProblems() {
   tableLoading.value = true
-  api.get('api/auth/problems/all?token='+localStorage.getItem("token"))
+  api.get('api/auth/problems/all?token=' + localStorage.getItem("token"))
     .then(response => {
       rows = response.data
       tableLoading.value = false
@@ -129,9 +159,9 @@ onMounted(() => {
   fetchProblems()
 })
 
-function addProblem(){
+function addProblem() {
   loading.value = true
-  api.post('api/auth/problems/create?token='+localStorage.getItem("token"),editedItem)
+  api.post('api/auth/problems/create?token=' + localStorage.getItem("token"), editedItem)
     .then(response => {
       fetchProblems()
       loading.value = false
@@ -149,7 +179,6 @@ function editItem(item) {
   editedItem = Object.assign({}, item);
   showDialog.value = true
 }
-
 
 
 </script>
