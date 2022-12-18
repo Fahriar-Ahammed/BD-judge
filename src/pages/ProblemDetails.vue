@@ -39,7 +39,7 @@
 
 <script setup>
 import {Codemirror} from 'vue-codemirror'
-import { onMounted, ref,shallowRef} from "vue";
+import {onMounted, reactive, ref, shallowRef} from "vue";
 import {api} from "boot/axios";
 import {useRoute} from "vue-router/dist/vue-router";
 import {javascript} from '@codemirror/lang-javascript'
@@ -55,16 +55,20 @@ const problem = ref({})
 const route = useRoute();
 /*let id = route.params.id*/
 
+let testCases = ref([])
 
 let tableLoading = ref(false)
 function fetchProblem(id) {
   tableLoading.value = true
   api.get('api/auth/problem/view/'+id+'?token='+localStorage.getItem("token"))
     .then(response => {
-      // console.log(response.data)
+      console.log(response.data)
       problem.value = response.data
+      testCases = response.data.test_cases
       tableLoading.value = false
     })
+
+
 }
 
 
@@ -86,10 +90,12 @@ let handleReady= ref()
 
 async function submit() {
   let self = this
+
+
   await axios.post('http://localhost:2358/submissions', {
     source_code: self.code,
     language_id: language.value.value,
-    stdin: 'Good',
+    stdin: '30\n10',
   })
     .then(function (response) {
       console.log(response.data.token);
@@ -101,13 +107,14 @@ async function submit() {
     .catch(function (error) {
       console.log(error);
     });
+
+  console.log("@@@",testCases)
 }
 async function submissionResult(token) {
   await axios.get('http://localhost:2358/submissions/' + token)
     .then(function (response) {
       // handle success
       console.log(response);
-      showNotif()
     })
     .catch(function (error) {
       // handle error

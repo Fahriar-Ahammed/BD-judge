@@ -1,6 +1,6 @@
 <template>
   <q-page class="flex flex-center">
-    <div class="q-gutter-y-md" style="max-width: 600px; width: 100%">
+    <div class="q-gutter-y-md" style="max-width: 1000px; width: 100%">
       <q-card>
         <q-tabs
           v-model="tab"
@@ -17,7 +17,7 @@
         <q-tab-panels v-model="tab" animated class="bg-white">
           <q-tab-panel name="easy">
             <q-table
-              title="Treats"
+              title="Problems"
               :rows="rows"
               :columns="columns"
               row-key="id"
