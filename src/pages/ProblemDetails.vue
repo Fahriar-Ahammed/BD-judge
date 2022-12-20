@@ -57,6 +57,8 @@ const route = useRoute();
 
 let testCases = ref([])
 
+let submissionTokens = reactive([{token:""}])
+
 let tableLoading = ref(false)
 function fetchProblem(id) {
   tableLoading.value = true
@@ -67,10 +69,7 @@ function fetchProblem(id) {
       testCases = response.data.test_cases
       tableLoading.value = false
     })
-
-
 }
-
 
 let code= ref()
 //const options = ['C', 'Cpp', 'Java', 'Javascript', 'Python']
@@ -88,36 +87,39 @@ let language = ref({
 let extensions = ref()
 let handleReady= ref()
 
-async function submit() {
-  let self = this
+function submit() {
 
+  // using forEach
+  testCases.forEach(myFunction);
 
-  await axios.post('http://localhost:2358/submissions', {
-    source_code: self.code,
-    language_id: language.value.value,
-    stdin: '30\n10',
-  })
-    .then(function (response) {
-      console.log(response.data.token);
-      self.delay(1000).then(() => {
-        self.submissionResult(response.data.token);
-      })
-
+  async function myFunction(item) {
+    console.log(item.input);
+    await axios.post('http://localhost:2358/submissions', {
+      source_code: code.value,
+      language_id: language.value.value,
+      stdin: item.input,
     })
-    .catch(function (error) {
-      console.log(error);
-    });
+      .then(function (response) {
+        submissionTokens.push({token:response.data.token})
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
 
-  console.log("@@@",testCases)
+  this.delay(1000).then(() => {
+    submissionTokens.forEach(submissionResult)
+  })
+
 }
+
 async function submissionResult(token) {
-  await axios.get('http://localhost:2358/submissions/' + token)
+  /*console.log(token.token)*/
+  await axios.get('http://localhost:2358/submissions/' + token.token)
     .then(function (response) {
-      // handle success
       console.log(response);
     })
     .catch(function (error) {
-      // handle error
       console.log(error);
     });
 }

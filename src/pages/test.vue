@@ -63,7 +63,6 @@ export default defineComponent({
           self.delay(2000).then(() => {
             self.submissionResult(response.data.token);
           })
-
         })
         .catch(function (error) {
           console.log(error);
